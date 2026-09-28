@@ -65,6 +65,8 @@ for (const width of [1440, 390]) {
         (s) => s.getBBox && s.getBoundingClientRect().width > 0 && s.childElementCount === 0,
       ).length,
     }))
+    // несуществующий адрес на статическом хостинге честно отвечает 404 — это ожидаемо
+    if (r === "/takoy-stranicy-net") page.errors = page.errors.filter((e) => !/404/.test(e))
     ok(
       `[${width}] ${r}`,
       page.errors.length === 0 &&
@@ -179,10 +181,20 @@ for (const width of [1440, 390]) {
     await success.waitFor({ state: "visible", timeout: 5000 })
     visible = true
   } catch {
-const diag = await page.evaluate(() => ({
+    const diag = await page.evaluate(() => ({
       active: document.activeElement?.tagName + " " + (document.activeElement?.textContent || "").slice(0, 30),
-      values: [...document.querySelectorAll("[data-testid=booking-dialog] input, [data-testid=booking-dialog] [role=combobox], [data-testid=booking-dialog] [role=checkbox]")].map(
-        (i) => (i.name || i.getAttribute("role")) + "=" + (i.value ?? "") + (i.type === "radio" ? (i.checked ? "*" : "") : "") + (i.getAttribute("aria-checked") ? "[" + i.getAttribute("aria-checked") + "]" : "") + (i.getAttribute("role") === "combobox" ? "«" + i.textContent + "»" : ""),
+      values: [
+        ...document.querySelectorAll(
+          "[data-testid=booking-dialog] input, [data-testid=booking-dialog] [role=combobox], [data-testid=booking-dialog] [role=checkbox]",
+        ),
+      ].map(
+        (i) =>
+          (i.name || i.getAttribute("role")) +
+          "=" +
+          (i.value ?? "") +
+          (i.type === "radio" ? (i.checked ? "*" : "") : "") +
+          (i.getAttribute("aria-checked") ? "[" + i.getAttribute("aria-checked") + "]" : "") +
+          (i.getAttribute("role") === "combobox" ? "«" + i.textContent + "»" : ""),
       ),
       invalid: [...document.querySelectorAll("[data-testid=booking-dialog] [aria-invalid=true]")].length,
     }))
