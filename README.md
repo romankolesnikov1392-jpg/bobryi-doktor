@@ -104,10 +104,11 @@ public/                         favicon.svg, apple-touch-icon.png, og.png
 ### GitHub Pages (настроен)
 
 Workflow [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) при каждом пуше в `main` собирает сайт
-с `BASE_PATH=/<имя репозитория>/`, копирует `index.html` в `404.html` (чтобы прямые ссылки вида `/kontakty` открывались)
-и публикует `dist/` на GitHub Pages. Ход сборки — вкладка **Actions** репозитория.
+с `BASE_PATH=/<имя репозитория>/`, скриптом [`scripts/pages-routes.mjs`](scripts/pages-routes.mjs) раскладывает `index.html`
+по папкам страниц (прямые ссылки вида `/kontakty` отвечают 200) и кладёт `404.html` для несуществующих адресов,
+затем публикует `dist/` на GitHub Pages. Ход сборки — вкладка **Actions** репозитория.
 
-Локально проверить сборку «как на Pages»: `BASE_PATH=/bobryi-doktor/ npm run build && BASE_PATH=/bobryi-doktor/ npm run preview`
+Локально проверить сборку «как на Pages»: `BASE_PATH=/bobryi-doktor/ npm run build && node scripts/pages-routes.mjs && BASE_PATH=/bobryi-doktor/ npm run preview`
 → http://localhost:4173/bobryi-doktor/
 
 ### Vercel (альтернатива)
