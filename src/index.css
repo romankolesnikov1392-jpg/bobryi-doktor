@@ -1,0 +1,622 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/nunito/wght.css";
+@import "@fontsource-variable/mulish/wght.css";
+@import "@fontsource/pangolin/cyrillic-400.css";
+@import "@fontsource/pangolin/latin-400.css";
+
+/* Hover-only motion: touch screens fire false hovers on tap. */
+@custom-variant hov {
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      @slot;
+    }
+  }
+}
+@custom-variant group-hov {
+  @media (hover: hover) and (pointer: fine) {
+    :where(.group):hover & {
+      @slot;
+    }
+  }
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Бренд-токены «Бобрый доктор»
+   ────────────────────────────────────────────────────────────── */
+@theme {
+  --color-mint: #8fe3c8;
+  --color-mint-deep: #3dbe96;
+  --color-mint-ink: #0f5f49;
+  --color-mint-soft: #dcf6ed;
+
+  --color-sky: #8fcbef;
+  --color-sky-deep: #4ea4d9;
+  --color-sky-ink: #164f74;
+  --color-sky-soft: #e2f2fb;
+
+  --color-coral: #ff9b85;
+  --color-coral-deep: #ea7a61;
+  --color-coral-ink: #9c3620;
+  --color-coral-soft: #ffe7e0;
+
+  --color-sun: #ffd873;
+  --color-sun-deep: #efb53b;
+  --color-sun-ink: #6e4a00;
+  --color-sun-soft: #fff3cf;
+
+  --color-lav: #c9b6f0;
+  --color-lav-deep: #9d84dc;
+  --color-lav-ink: #4f3494;
+  --color-lav-soft: #efe9fc;
+
+  --color-cream: #fffbf5;
+  --color-cream-2: #fff3e5;
+  --color-paper: #fffdf9;
+  --color-ink: #2e2a26;
+  --color-ink-soft: #5b534b;
+
+  /* Грыша */
+  --color-fur: #b9764a;
+  --color-fur-dark: #8b5230;
+  --color-fur-light: #f3d4aa;
+  --color-line: #3b2417;
+
+  --font-display: "Nunito Variable", "Nunito", ui-rounded, system-ui, sans-serif;
+  --font-sans: "Mulish Variable", "Mulish", system-ui, sans-serif;
+  --font-hand: "Pangolin", "Comic Sans MS", cursive;
+
+  /* Кривые — из easings.net / Emil Kowalski, не «на глаз» */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1); /* easeOutBack — лёгкий перелёт */
+
+  /* «Плюшевые» тени: тёплые, многослойные, с офсетом */
+  --shadow-plush-sm: 0 2px 0 rgb(150 88 48 / 0.08), 0 8px 18px -8px rgb(170 92 46 / 0.3);
+  --shadow-plush:
+    0 2px 0 rgb(150 88 48 / 0.07), 0 12px 26px -12px rgb(170 92 46 / 0.34), 0 28px 56px -30px rgb(170 92 46 / 0.3);
+  --shadow-plush-lg:
+    0 3px 0 rgb(150 88 48 / 0.07), 0 18px 36px -16px rgb(170 92 46 / 0.36), 0 44px 80px -40px rgb(170 92 46 / 0.34);
+
+  /* Петли маскота сами останавливаются за ≤5 с (WCAG 2.2.2 «Пауза, остановка, скрытие»),
+     наведение на персонажа «будит» его снова — см. .motion-loop:hover ниже */
+  --animate-bob: bob 2.4s ease-in-out 2;
+  --animate-float: float 4.8s ease-in-out 1 both;
+  --animate-blink: blink 4.8s linear 1;
+  --animate-wag: wag 2.4s ease-in-out 2;
+  --animate-wave: wave 1.6s ease-in-out 3;
+  --animate-spin-slow: spin 18s linear infinite;
+}
+
+@theme inline {
+  --font-heading: var(--font-display);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* shadcn-переменные, переопределённые под тему (без тёмной темы — детский сайт живёт при свете дня) */
+:root {
+  --background: var(--color-cream);
+  --foreground: var(--color-ink);
+  --card: var(--color-paper);
+  --card-foreground: var(--color-ink);
+  --popover: var(--color-paper);
+  --popover-foreground: var(--color-ink);
+  --primary: var(--color-coral);
+  --primary-foreground: var(--color-ink);
+  --secondary: var(--color-mint);
+  --secondary-foreground: var(--color-ink);
+  --muted: var(--color-cream-2);
+  --muted-foreground: var(--color-ink-soft);
+  --accent: var(--color-sun-soft);
+  --accent-foreground: var(--color-ink);
+  --destructive: #b3261e;
+  --border: rgb(46 42 38 / 0.14);
+  --input: rgb(46 42 38 / 0.22);
+  --ring: var(--color-ink);
+  --radius: 0.875rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+    scroll-padding-top: 6rem;
+    color-scheme: light;
+  }
+  a,
+  button,
+  input,
+  label,
+  select,
+  summary,
+  textarea,
+  [role="button"] {
+    touch-action: manipulation;
+  }
+  body {
+    @apply bg-cream font-sans text-ink antialiased;
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    overflow-x: clip;
+    font-optical-sizing: auto;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    text-wrap: balance;
+    letter-spacing: -0.015em;
+    line-height: 1.08;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  ::selection {
+    background: var(--color-sun);
+    color: var(--color-ink);
+  }
+  :focus-visible {
+    outline: 3px solid var(--color-ink);
+    outline-offset: 3px;
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+  svg {
+    overflow: visible;
+  }
+  input,
+  select,
+  textarea {
+    font-size: max(16px, 1em); /* iOS не зумит страницу при фокусе */
+  }
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Материал
+   ────────────────────────────────────────────────────────────── */
+@utility font-hand {
+  font-family: var(--font-hand);
+  letter-spacing: 0;
+  font-weight: 400;
+}
+
+/* Органические радиусы — чуть разные углы, как у вырезанной ножницами бумаги */
+@utility r-blob-1 {
+  border-radius: 34px 26px 38px 24px / 28px 36px 26px 32px;
+}
+@utility r-blob-2 {
+  border-radius: 24px 38px 28px 34px / 34px 24px 36px 26px;
+}
+@utility r-blob-3 {
+  border-radius: 44px 30px 22px 40px / 30px 44px 36px 24px;
+}
+@utility r-note {
+  border-radius: 6px 18px 10px 22px;
+}
+
+/* Бумажная «наклейка»: белая кайма + плюшевая тень */
+@utility sticker {
+  background: var(--color-paper);
+  box-shadow:
+    0 0 0 5px #fff,
+    var(--shadow-plush);
+}
+
+/* Кнопка с «губой» снизу: при нажатии проваливается в подложку.
+   Анимируем только transform — лицо и губа живут на псевдоэлементах. */
+@utility btn-lip {
+  position: relative;
+  isolation: isolate;
+  background: transparent !important;
+  transition: transform 140ms var(--ease-out);
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+  }
+  &::before {
+    z-index: -1;
+    background: var(--face);
+    box-shadow: var(--face-ring, none);
+    transition: background-color 180ms ease;
+  }
+  &::after {
+    z-index: -2;
+    background: var(--lip);
+    transform: translateY(4px);
+    box-shadow: 0 14px 22px -12px var(--glow, rgb(170 92 46 / 0.45));
+    transition: transform 140ms var(--ease-out);
+  }
+  &:active:not(:disabled) {
+    transform: translateY(3px);
+  }
+  &:active:not(:disabled)::after {
+    transform: translateY(1px);
+  }
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Моушн
+   ────────────────────────────────────────────────────────────── */
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(var(--r, 0deg));
+  }
+  50% {
+    transform: translateY(-10px) rotate(calc(var(--r, 0deg) + 4deg));
+  }
+}
+@keyframes blink {
+  0%,
+  93%,
+  100% {
+    transform: scaleY(1);
+  }
+  95.5% {
+    transform: scaleY(0.08);
+  }
+}
+/* Начало и конец — в позе покоя: петли ограничены по времени и не должны «щёлкать» в конце */
+@keyframes wag {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  25% {
+    transform: rotate(-5deg);
+  }
+  75% {
+    transform: rotate(7deg);
+  }
+}
+@keyframes wave {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  25% {
+    transform: rotate(-14deg);
+  }
+  75% {
+    transform: rotate(14deg);
+  }
+}
+@keyframes wiggle {
+  0% {
+    transform: rotate(0);
+  }
+  25% {
+    transform: rotate(-9deg) scale(1.04);
+  }
+  55% {
+    transform: rotate(7deg) scale(1.04);
+  }
+  80% {
+    transform: rotate(-3deg);
+  }
+  100% {
+    transform: rotate(0);
+  }
+}
+
+@keyframes page-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes success-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.86) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes bubble-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.97);
+  }
+}
+@keyframes foam {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(0.6);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-28px) scale(1.15);
+  }
+}
+@keyframes stamp-in {
+  0% {
+    opacity: 0;
+    transform: scale(1.6) rotate(var(--r, -8deg));
+  }
+  60% {
+    opacity: 1;
+    transform: scale(0.94) rotate(var(--r, -8deg));
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(var(--r, -8deg));
+  }
+}
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-8px) rotate(-2deg);
+  }
+  40% {
+    transform: translateX(7px) rotate(1.5deg);
+  }
+  60% {
+    transform: translateX(-5px);
+  }
+  80% {
+    transform: translateX(3px);
+  }
+}
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+/* Вход hero: строки и наклейки появляются по очереди (редкое событие — можно с характером) */
+@keyframes hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(26px) rotate(var(--r, 0deg));
+  }
+  to {
+    opacity: 1;
+    transform: rotate(var(--r, 0deg));
+  }
+}
+@keyframes hero-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.82) rotate(calc(var(--r, 0deg) - 8deg));
+  }
+  to {
+    opacity: 1;
+    transform: rotate(var(--r, 0deg));
+  }
+}
+.enter-rise {
+  animation: hero-rise 700ms var(--ease-spring) both;
+  animation-delay: var(--d, 0ms);
+}
+.enter-pop {
+  animation: hero-pop 760ms var(--ease-spring) both;
+  animation-delay: var(--d, 0ms);
+}
+.page-enter {
+  animation: page-in 280ms var(--ease-out) both;
+}
+
+.skip-link {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 100;
+  padding: 12px 18px;
+  border-radius: 999px;
+  background: var(--color-ink);
+  color: var(--color-cream);
+  font-weight: 800;
+  transform: translateY(-160%);
+  transition: transform 200ms var(--ease-out);
+}
+.skip-link:focus-visible {
+  transform: none;
+}
+
+/* Пилюля активного пункта меню (Header): CSS-переход вместо JS-layout-анимации */
+.nav-indicator[data-ready] {
+  transition:
+    transform 280ms var(--ease-spring),
+    width 280ms var(--ease-spring),
+    background-color 200ms ease,
+    opacity 200ms ease;
+}
+
+/* Тень шапки при скролле: проявляем готовую тень прозрачностью, а не перерисовкой box-shadow */
+.header-bar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  box-shadow: var(--shadow-plush);
+  opacity: 0;
+  transition: opacity 300ms ease;
+  pointer-events: none;
+}
+.header-bar[data-scrolled]::after {
+  opacity: 1;
+}
+
+/* Скролл-появление с вариациями (IntersectionObserver ставит data-inview) */
+.reveal {
+  opacity: 0;
+  transition:
+    opacity 520ms var(--ease-out),
+    transform 720ms var(--ease-spring);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+.reveal[data-variant="rise"] {
+  transform: translateY(28px);
+}
+.reveal[data-variant="pop"] {
+  transform: scale(0.9);
+}
+.reveal[data-variant="tilt-l"] {
+  transform: translateY(24px) rotate(-6deg);
+}
+.reveal[data-variant="tilt-r"] {
+  transform: translateY(24px) rotate(6deg);
+}
+.reveal[data-variant="swing"] {
+  transform-origin: 50% 0;
+  transform: perspective(900px) rotateX(-28deg);
+}
+.reveal[data-variant="slide-l"] {
+  transform: translateX(-44px);
+}
+.reveal[data-variant="slide-r"] {
+  transform: translateX(44px);
+}
+.reveal[data-variant="drop"] {
+  transform: translateY(-36px) rotate(-3deg);
+}
+.reveal[data-inview="true"] {
+  opacity: 1;
+  transform: none;
+}
+
+/* Наведение «будит» Грышу: петли снова идут, пока курсор на нём */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .motion-loop:hover,
+  .motion-loop:hover * {
+    animation-iteration-count: infinite !important;
+  }
+}
+
+/* Иконки и мелкие стикеры: покачивание при наведении */
+@media (hover: hover) and (pointer: fine) {
+  .wiggle-on-hover:hover .wiggle-target,
+  .wiggle-target.wiggle-self:hover {
+    animation: wiggle 420ms var(--ease-out);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal[data-variant] {
+    transform: none !important;
+    transition: opacity 300ms ease;
+  }
+  .motion-loop,
+  .motion-loop *,
+  .wiggle-target {
+    animation: none !important;
+  }
+  .enter-rise,
+  .enter-pop,
+  .page-enter {
+    animation-name: page-fade;
+    animation-duration: 240ms;
+  }
+  .btn-lip,
+  .btn-lip::after {
+    transition-duration: 0ms;
+  }
+  .nav-indicator[data-ready] {
+    transition: opacity 200ms ease;
+  }
+  /* модалка, шторка, табы — без перемещений, только прозрачность */
+  [data-slot="dialog-content"][data-starting-style],
+  [data-slot="dialog-content"][data-ending-style] {
+    scale: 1;
+    translate: -50% -50%;
+  }
+  [data-slot="sheet-content"] {
+    transition-property: opacity !important;
+  }
+  [data-slot="sheet-content"][data-starting-style],
+  [data-slot="sheet-content"][data-ending-style] {
+    translate: 0 0 !important;
+    opacity: 0;
+  }
+  [data-slot="tabs-indicator"] {
+    transition: none !important;
+  }
+  [class*="animate-[bubble-in"],
+  [class*="animate-[success-pop"],
+  [class*="animate-[stamp-in"] {
+    animation-name: page-fade !important;
+  }
+  [class*="animate-[shake"] {
+    animation: none !important;
+  }
+}
+
+.print-root {
+  display: none;
+}
+@media print {
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  /* печать раскраски: на листе только она */
+  body:has(.print-root) > *:not(.print-root) {
+    display: none !important;
+  }
+  body:has(.print-root) {
+    background: #fff;
+  }
+  .print-root {
+    display: block;
+  }
+  @page {
+    size: A4;
+    margin: 8mm;
+  }
+}
